@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Groot — RAG Chat</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="/static/style.css" />
+  <link rel="icon" type="image/svg+xml" href="/static/favicon.svg" />
+  <link rel="alternate icon" href="/static/favicon.svg" />
+</head>
+<body>
+  <div class="app">
+
+    <!-- ── Sidebar ── -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+
+        <!-- Brand -->
+        <div class="brand">
+          <div class="brand-icon">
+            <svg width="22" height="22" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+              <path d="M 256 480 C 340 480, 385 410, 395 320 L 415 130 L 370 180 L 335 50 L 295 160 L 255 30 L 215 170 L 175 50 L 142 180 L 97 130 L 117 320 C 127 410, 172 480, 256 480 Z" fill="#2E1B0E"/>
+              <path d="M 256 465 C 330 465, 365 400, 375 320 L 390 150 L 360 190 L 330 70 L 290 170 L 255 50 L 220 170 L 182 70 L 152 190 L 122 150 L 137 320 C 147 400, 182 465, 256 465 Z" fill="#5E3A21"/>
+              <path d="M 245 70 L 255 180 L 265 70 Z" fill="#81502E"/>
+              <path d="M 220 180 L 240 220 L 215 260 Z" fill="#81502E"/>
+              <path d="M 292 180 L 272 220 L 297 260 Z" fill="#81502E"/>
+              <path d="M 256 50 C 270 120, 270 180, 256 240 C 242 180, 242 120, 256 50 Z" fill="#754728"/>
+              <path d="M 137 320 C 145 370, 170 410, 210 430 L 195 340 C 170 330, 150 280, 142 240 Z" fill="#754728"/>
+              <path d="M 375 320 C 367 370, 342 410, 302 430 L 317 340 C 342 330, 362 280, 370 240 Z" fill="#754728"/>
+              <path d="M 210 430 C 230 460, 282 460, 302 430 L 290 380 C 270 390, 242 390, 222 380 Z" fill="#6B3F21"/>
+              <path d="M 125 240 C 150 215, 190 220, 225 245" fill="none" stroke="#3D2314" stroke-width="14" stroke-linecap="round"/>
+              <path d="M 387 240 C 362 215, 322 220, 287 245" fill="none" stroke="#3D2314" stroke-width="14" stroke-linecap="round"/>
+              <ellipse cx="175" cy="275" rx="42" ry="52" fill="#241308" transform="rotate(-15 175 275)"/>
+              <ellipse cx="337" cy="275" rx="42" ry="52" fill="#241308" transform="rotate(15 337 275)"/>
+              <ellipse cx="178" cy="278" rx="33" ry="42" fill="#0A0A0A" transform="rotate(-12 178 278)"/>
+              <ellipse cx="334" cy="278" rx="33" ry="42" fill="#0A0A0A" transform="rotate(12 334 278)"/>
+              <circle cx="188" cy="260" r="12" fill="#FFFFFF"/>
+              <circle cx="324" cy="260" r="12" fill="#FFFFFF"/>
+              <circle cx="168" cy="295" r="4" fill="#FFFFFF" opacity="0.6"/>
+              <circle cx="344" cy="295" r="4" fill="#FFFFFF" opacity="0.6"/>
+              <path d="M 215 375 C 235 395, 277 395, 297 375" fill="none" stroke="#1A0E05" stroke-width="7" stroke-linecap="round"/>
+              <path d="M 182 70 C 160 40, 150 10, 175 0 C 190 -5, 200 30, 182 70 Z" fill="#4CAF50" stroke="#2E7D32" stroke-width="2"/>
+              <path d="M 182 70 C 200 40, 220 10, 195 0 C 180 -5, 170 30, 182 70 Z" fill="#81C784" stroke="#2E7D32" stroke-width="2"/>
+              <path d="M 330 70 C 350 40, 380 30, 360 10 C 340 0, 320 30, 330 70 Z" fill="#66BB6A" stroke="#2E7D32" stroke-width="2"/>
+            </svg>
+          </div>
+          <div>
+            <span class="brand-name">Groot</span>
+            <span class="brand-tag">RAG · v1.0</span>
+          </div>
+        </div>
+
+        <!-- New chat -->
+        <button id="new-chat-btn" class="new-chat-btn">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          New chat
+        </button>
+      </div>
+
+      <p class="sidebar-section-label">Recent</p>
+
+      <nav id="conversation-list" class="conversation-list" aria-label="Conversation history">
+        <!-- injected by app.js -->
+      </nav>
+
+      <div class="sidebar-footer">
+        <span id="connection-dot" class="connection-dot" title="Checking connection…"></span>
+        <span id="connection-label" class="mono">checking…</span>
+      </div>
+    </aside>
+
+    <!-- ── Chat main ── -->
+    <main class="chat-main empty-mode" id="chat-main">
+
+      <!-- Centered hero (only visible in empty-mode) -->
+      <div class="centered-hero" id="centered-hero">
+        <div class="hero-groot-icon">
+          <svg width="52" height="52" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+            <path d="M 256 480 C 340 480, 385 410, 395 320 L 415 130 L 370 180 L 335 50 L 295 160 L 255 30 L 215 170 L 175 50 L 142 180 L 97 130 L 117 320 C 127 410, 172 480, 256 480 Z" fill="#2E1B0E"/>
+            <path d="M 256 465 C 330 465, 365 400, 375 320 L 390 150 L 360 190 L 330 70 L 290 170 L 255 50 L 220 170 L 182 70 L 152 190 L 122 150 L 137 320 C 147 400, 182 465, 256 465 Z" fill="#5E3A21"/>
+            <path d="M 245 70 L 255 180 L 265 70 Z" fill="#81502E"/>
+            <path d="M 220 180 L 240 220 L 215 260 Z" fill="#81502E"/>
+            <path d="M 292 180 L 272 220 L 297 260 Z" fill="#81502E"/>
+            <path d="M 256 50 C 270 120, 270 180, 256 240 C 242 180, 242 120, 256 50 Z" fill="#754728"/>
+            <path d="M 137 320 C 145 370, 170 410, 210 430 L 195 340 C 170 330, 150 280, 142 240 Z" fill="#754728"/>
+            <path d="M 375 320 C 367 370, 342 410, 302 430 L 317 340 C 342 330, 362 280, 370 240 Z" fill="#754728"/>
+            <path d="M 210 430 C 230 460, 282 460, 302 430 L 290 380 C 270 390, 242 390, 222 380 Z" fill="#6B3F21"/>
+            <path d="M 125 240 C 150 215, 190 220, 225 245" fill="none" stroke="#3D2314" stroke-width="14" stroke-linecap="round"/>
+            <path d="M 387 240 C 362 215, 322 220, 287 245" fill="none" stroke="#3D2314" stroke-width="14" stroke-linecap="round"/>
+            <ellipse cx="175" cy="275" rx="42" ry="52" fill="#241308" transform="rotate(-15 175 275)"/>
+            <ellipse cx="337" cy="275" rx="42" ry="52" fill="#241308" transform="rotate(15 337 275)"/>
+            <ellipse cx="178" cy="278" rx="33" ry="42" fill="#0A0A0A" transform="rotate(-12 178 278)"/>
+            <ellipse cx="334" cy="278" rx="33" ry="42" fill="#0A0A0A" transform="rotate(12 334 278)"/>
+            <circle cx="188" cy="260" r="12" fill="#FFFFFF"/>
+            <circle cx="324" cy="260" r="12" fill="#FFFFFF"/>
+            <circle cx="168" cy="295" r="4" fill="#FFFFFF" opacity="0.6"/>
+            <circle cx="344" cy="295" r="4" fill="#FFFFFF" opacity="0.6"/>
+            <ellipse cx="185" cy="285" rx="15" ry="8" fill="#4B3A2C" opacity="0.4" transform="rotate(-20 185 285)"/>
+            <ellipse cx="327" cy="285" rx="15" ry="8" fill="#4B3A2C" opacity="0.4" transform="rotate(20 327 285)"/>
+            <path d="M 215 375 C 235 395, 277 395, 297 375" fill="none" stroke="#1A0E05" stroke-width="7" stroke-linecap="round"/>
+            <path d="M 200 365 C 205 370, 210 372, 215 375" fill="none" stroke="#3D2314" stroke-width="5" stroke-linecap="round"/>
+            <path d="M 312 365 C 307 370, 302 372, 297 375" fill="none" stroke="#3D2314" stroke-width="5" stroke-linecap="round"/>
+            <path d="M 145 280 Q 155 330, 160 380" fill="none" stroke="#3D2314" stroke-width="4" stroke-linecap="round"/>
+            <path d="M 367 280 Q 357 330, 352 380" fill="none" stroke="#3D2314" stroke-width="4" stroke-linecap="round"/>
+            <path d="M 182 70 C 160 40, 150 10, 175 0 C 190 -5, 200 30, 182 70 Z" fill="#4CAF50" stroke="#2E7D32" stroke-width="2"/>
+            <path d="M 182 70 C 200 40, 220 10, 195 0 C 180 -5, 170 30, 182 70 Z" fill="#81C784" stroke="#2E7D32" stroke-width="2"/>
+            <path d="M 330 70 C 350 40, 380 30, 360 10 C 340 0, 320 30, 330 70 Z" fill="#66BB6A" stroke="#2E7D32" stroke-width="2"/>
+            <path d="M 127 320 C 115 325, 110 340, 120 350 C 130 360, 145 350, 137 320 Z" fill="#4CAF50" opacity="0.8"/>
+            <path d="M 385 300 C 400 305, 410 320, 395 330 C 385 340, 375 320, 385 300 Z" fill="#66BB6A" opacity="0.7"/>
+          </svg>
+        </div>
+        <h1 class="hero-title">I am Groot.</h1>
+        <p class="hero-sub">Ask anything, or attach a document and ask about it. Each conversation keeps its own document scope.</p>
+      </div>
+
+      <!-- Message stream (hidden in empty-mode) -->
+      <div id="message-stream" class="message-stream"></div>
+
+      <!-- Input dock -->
+      <div class="input-dock">
+
+        <!-- Indexed doc chips -->
+        <div id="doc-chip-row" class="doc-chip-row" hidden></div>
+
+        <!-- Pending attached file chips (pre-send) -->
+        <div id="attached-files-row" class="attached-files-row" hidden></div>
+
+        <!-- Upload/ingestion progress indicator -->
+        <div id="upload-status-row" class="upload-status-row" hidden></div>
+
+        <div class="input-bar">
+          <button id="attach-btn" class="icon-btn" title="Attach a document" type="button">
+            <!-- paperclip -->
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M13.5 7.5L7.5 13.5C5.84 15.16 3.16 15.16 1.5 13.5C-0.16 11.84 -0.16 9.16 1.5 7.5L8 1C9.1 -0.1 10.9 -0.1 12 1C13.1 2.1 13.1 3.9 12 5L5.5 11.5C5 12 4 12 3.5 11.5C3 11 3 10 3.5 9.5L9 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <input id="file-input" type="file" hidden accept=".pdf,.docx,.csv,.xlsx,.xls,.txt,.png,.jpg,.jpeg" />
+
+          <textarea
+            id="question-input"
+            class="question-input"
+            placeholder="Message Groot…"
+            rows="1"
+          ></textarea>
+
+          <button id="send-btn" class="icon-btn send-btn" title="Send" type="button" disabled>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M2 8h12M8 2l6 6-6 6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+
+        <p class="input-hint mono">Documents and web search are used automatically when they help.</p>
+      </div>
+    </main>
+  </div>
+
+  <!-- Themed delete-confirmation modal (replaces native confirm()) -->
+  <div id="confirm-modal" class="modal-overlay" hidden>
+    <div class="modal-box" role="alertdialog" aria-modal="true" aria-labelledby="confirm-modal-title">
+      <h2 id="confirm-modal-title" class="modal-title">Delete this chat?</h2>
+      <p id="confirm-modal-body" class="modal-body">This cannot be undone.</p>
+      <div class="modal-actions">
+        <button id="confirm-modal-cancel" class="modal-btn modal-btn-secondary" type="button">Cancel</button>
+        <button id="confirm-modal-confirm" class="modal-btn modal-btn-danger" type="button">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,8 @@
+__pycache__/
+*.py[cod]
+agent
+faiss_indexes/
+myenv/
+.env
+5.0/
+rag_chatbot.log/
